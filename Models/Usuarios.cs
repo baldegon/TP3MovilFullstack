@@ -11,12 +11,12 @@ namespace TP3MovilFullstack.Models
         // Unique identifier for the user.
         public int Id { get; set; }
         // User's name.
-        public string Nombre { get; set; }
+        public string? Nombre { get; set; }
         // User's email, used for login.
-        public string Email { get; set; }
+        public string? Email { get; set; }
         // User's password (for demonstration, in a real app this should be hashed).
-        public string Password { get; set; }
+        public string? Password { get; set; }
         // Path to the local image file for the user.
-        public string ImagenPath { get; set; }
+        public string? ImagenPath { get; set; }
     }
 }

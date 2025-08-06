@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using TP3MovilFullstack.Services;
 
 namespace TP3MovilFullstack
 {
@@ -18,7 +19,8 @@ namespace TP3MovilFullstack
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddSingleton<PeliculaService>();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

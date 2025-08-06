@@ -9,28 +9,30 @@ namespace TP3MovilFullstack.Services
 {
     public class PeliculaService
     {
-        public readonly List<Pelicula> peliculas;
+        private readonly List<Pelicula> peliculas;
         public PeliculaService()
         {
-            peliculas = new List<Pelicula>();
+            peliculas = new List<Pelicula>
             {
-
-                new Pelicula { Id = 1, Titulo = "El Origen", Anio = 2010, Director = "Christopher Nolan", ImagenPath = "images/poster_origen.jpg" };
-                new Pelicula { Id = 2, Titulo = "Interstellar", Anio = 2014, Director = "Christopher Nolan", ImagenPath = "images/poster_interstellar.jpg" };
-                new Pelicula { Id = 3, Titulo = "Parasite", Anio = 2019, Director = "Bong Joon-ho", ImagenPath = "images/poster_parasite.jpg" };
+                new Pelicula { Id = 1, Titulo = "El Origen", Anio = 2010, Director = "Christopher Nolan", ImagenPath = "images/poster_origen.jpg" },
+                new Pelicula { Id = 2, Titulo = "Interstellar", Anio = 2014, Director = "Christopher Nolan", ImagenPath = "images/poster_interstellar.jpg" },
+                new Pelicula { Id = 3, Titulo = "Parasite", Anio = 2019, Director = "Bong Joon-ho", ImagenPath = "images/poster_parasite.jpg" }
             };
         }
 
+        public List<Pelicula> GetAll() => peliculas;
 
-        public Pelicula GetPeliculas(int id)
+
+        public Pelicula? GetPelicula(int id)
         {
             return peliculas.FirstOrDefault(p => p.Id == id);
         
         }
 
-        public void AddPeliculas(Pelicula pelicula)
+        public void AddPelicula(Pelicula pelicula)
         {
-            pelicula.Id = peliculas.Max(p => p.Id) + 1;
+            //pelicula.Id = peliculas.Max(p => p.Id) + 1;
+            pelicula.Id = peliculas.Any() ? peliculas.Max(p => p.Id) + 1 : 1;
             peliculas.Add(pelicula);
         }
 

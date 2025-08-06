@@ -1,20 +1,12 @@
-﻿@page "/pelicula/{id}"
-@using TP3MovilFullstack.Models
-@using TP3MovilFullstack.Services
+﻿@page "/pelicula"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
 
-<h3>
-    @if(id == "0"){
-        <span>Agregar Pelicula</span>
-    }
-    else{
-        <span>Editar Pelicula</span>
-    }
-</h3>
 
 
-<EditForm OnValidSubmit="@Grabar" Model="@pelicula">
+<EditForm Model="@pelicula">
     <div class="mt-3">
         <InputText @bind-Value="@pelicula.Titulo" placeholder="Nombre" />
     </div>
@@ -36,40 +28,18 @@
 </div>
 
 @code {
-    [Parameter]
-    public string id { get; set; }
+   
+    public Pelicula pelicula = new Pelicula();
 
-    public Pelicula pelicula;
-
-    protected override void OnParametersSet()
-    {
-        try
-        {
-            if (int.Parse(id) == 0)
-            {
-                pelicula = new Pelicula();
-            }
-            else
-            {
-                pelicula = peliculaService.GetPeliculas(int.Parse(id));
-            }
-        }
-        catch (Exception ex)
-        {
-
-            Console.WriteLine(ex.Message);
-        }
-    }
 
     public void Volver()
     {
         // Navegar a la página de edición del producto
-        navigationManager.NavigateTo($"/home");
+        navigationManager.NavigateTo("/");
     }
 
     public async Task Grabar()
     {
-        peliculaService.AddPeliculas(pelicula);
-        navigationManager.NavigateTo("/peliculas");
+        peliculaService.AddPelicula(pelicula);
     }
 }
