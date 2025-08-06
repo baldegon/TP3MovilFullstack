@@ -1,0 +1,75 @@
+﻿@page "/pelicula/{id}"
+@using TP3MovilFullstack.Models
+@using TP3MovilFullstack.Services
+@inject NavigationManager navigationManager
+@inject PeliculaService peliculaService
+
+<h3>
+    @if(id == "0"){
+        <span>Agregar Pelicula</span>
+    }
+    else{
+        <span>Editar Pelicula</span>
+    }
+</h3>
+
+
+<EditForm OnValidSubmit="@Grabar" Model="@pelicula">
+    <div class="mt-3">
+        <InputText @bind-Value="@pelicula.Titulo" placeholder="Nombre" />
+    </div>
+    <div class="mt-3">
+        <InputNumber @bind-Value="@pelicula.Anio" placeholder="Precio" />
+    </div>
+    <div class="mt-3">
+        <InputText @bind-Value="@pelicula.Director" placeholder="Descripcion" />
+    </div>
+    <div class="mt-3">
+        <img src="@pelicula.ImagenPath" alt="Imagen del producto" style="width: 100px; height: 100px;" />
+    </div>
+</EditForm>
+
+
+<div class="text-center mt-3">
+    <button class="btn btn-primary" @onclick="Volver">Cancelar</button>
+    <button class="btn btn-success" @onclick="Grabar">Grabar</button>
+</div>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public Pelicula pelicula;
+
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            if (int.Parse(id) == 0)
+            {
+                pelicula = new Pelicula();
+            }
+            else
+            {
+                pelicula = peliculaService.GetPeliculas(int.Parse(id));
+            }
+        }
+        catch (Exception ex)
+        {
+
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public void Volver()
+    {
+        // Navegar a la página de edición del producto
+        navigationManager.NavigateTo($"/home");
+    }
+
+    public async Task Grabar()
+    {
+        peliculaService.AddPeliculas(pelicula);
+        navigationManager.NavigateTo("/peliculas");
+    }
+}
