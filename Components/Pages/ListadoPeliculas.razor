@@ -1,0 +1,117 @@
+@page "/peliculas"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
+@inject NavigationManager navigationManager
+@inject PeliculaService peliculaService
+
+<PageTitle>Listado de Películas</PageTitle>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="bi bi-film me-2"></i>
+                    Listado de Películas
+                </h2>
+                <button class="btn btn-success" @onclick="AgregarPelicula">
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Agregar Película
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (peliculas == null || !peliculas.Any())
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-info text-center" role="alert">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No hay películas disponibles en este momento.
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var pelicula in peliculas)
+            {
+                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
+                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                            {
+                                <img src="@pelicula.ImagenPath" 
+                                     alt="Póster de @pelicula.Titulo" 
+                                     class="img-fluid rounded-top" 
+                                     style="max-height: 100%; max-width: 100%; object-fit: cover;"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="text-center text-muted" style="display: none;">
+                                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">Imagen no disponible</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-image" style="font-size: 3rem;"></i>
+                                    <p class="mt-2 mb-0">Sin imagen</p>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@pelicula.Titulo</h5>
+                            <p class="card-text">
+                                <strong>Director:</strong> @pelicula.Director<br />
+                                <strong>Año:</strong> @pelicula.Anio
+                            </p>
+                            <div class="mt-auto">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-primary btn-sm" @onclick="() => VerDetalle(pelicula.Id)">
+                                        <i class="bi bi-eye me-1"></i>
+                                        Ver Detalles
+                                    </button>
+                                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => EditarPelicula(pelicula.Id)">
+                                        <i class="bi bi-pencil me-1"></i>
+                                        Editar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Pelicula>? peliculas;
+
+    protected override void OnInitialized()
+    {
+        CargarPeliculas();
+    }
+
+    private void CargarPeliculas()
+    {
+        peliculas = peliculaService.GetAll();
+    }
+
+    private void AgregarPelicula()
+    {
+        navigationManager.NavigateTo("/pelicula");
+    }
+
+    private void VerDetalle(int id)
+    {
+        navigationManager.NavigateTo($"/pelicula/detalle/{id}");
+    }
+
+    private void EditarPelicula(int id)
+    {
+        navigationManager.NavigateTo($"/pelicula/editar/{id}");
+    }
+}

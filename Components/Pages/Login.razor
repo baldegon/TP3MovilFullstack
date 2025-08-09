@@ -1,4 +1,7 @@
 ﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@inject TP3MovilFullstack.Services.UserService UserService
+@inject NavigationManager Navigation
 
 <PageTitle>Login</PageTitle>
 
@@ -7,24 +10,61 @@
         <div class="card-body">
             <h3 class="card-title text-center mb-4">Iniciar Sesión</h3>
            
-            <form>
+            <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
                 <div class="mb-3">
                     <label for="emailInput" class="form-label">Correo Electrónico</label>
-                    <input type="email" class="form-control" id="emailInput" placeholder="tu@ejemplo.com">
+                    <InputText type="email" class="form-control" id="emailInput" @bind-Value="loginModel.Email" />
                 </div>
                 <div class="mb-3">
                     <label for="passwordInput" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="passwordInput" placeholder="Contraseña">
+                    <InputText type="password" class="form-control" id="passwordInput" @bind-Value="loginModel.Password" />
                 </div>
                 <div class="d-grid gap-2">
-                    <input type="submit" class="btn btn-primary" value="save"/>
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                 </div>
-            </form>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary" @onclick="Registro">Registro</button>
+                </div>
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger mt-3">@errorMessage</div>
+                }
+            </EditForm>
         </div>
     </div>
 </div>
 
 @code {
+    private LoginModel loginModel = new();
+    private string? errorMessage;
 
+    private void HandleLogin()
+    {
+        var user = UserService.ValidateLogin(loginModel.Email, loginModel.Password);
+        if (user != null)
+        {
+            // Redirigir a la página de usuario o dashboard
+            Navigation.NavigateTo("/userpage");
+        }
+        else
+        {
+            errorMessage = "Correo o contraseña incorrectos.";
+        }
+    }
 
+    public class LoginModel
+    {
+        [Required(ErrorMessage = "El correo es obligatorio")]
+        [EmailAddress(ErrorMessage = "Correo inválido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public void Registro(){
+        Navigation.NavigateTo("/registro"); 
+    }
 }

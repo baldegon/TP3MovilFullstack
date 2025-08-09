@@ -1,0 +1,203 @@
+@page "/usuario/agregar"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
+@inject NavigationManager navigationManager
+@inject UserService userService
+
+<PageTitle>Agregar Usuario</PageTitle>
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/usuarios" class="text-decoration-none">
+                            <i class="bi bi-people me-1"></i>Usuarios
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Agregar Usuario</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-plus me-2"></i>
+                        Agregar Nuevo Usuario
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(mensajeError))
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            @mensajeError
+                        </div>
+                    }
+
+                    <EditForm Model="@usuario" OnValidSubmit="@GuardarUsuario">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger mb-3" />
+                        
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label">Nombre Completo *</label>
+                                    <InputText @bind-Value="@usuario.Nombre" class="form-control" id="nombre" placeholder="Ingrese el nombre completo" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Correo Electrónico *</label>
+                                    <InputText @bind-Value="@usuario.Email" type="email" class="form-control" id="email" placeholder="usuario@ejemplo.com" />
+                                    <div class="form-text">Este email se usará para iniciar sesión</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Contraseña *</label>
+                                    <InputText @bind-Value="@usuario.Password" type="password" class="form-control" id="password" placeholder="Ingrese una contraseña" />
+                                    <div class="form-text">Mínimo 6 caracteres</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="imagen" class="form-label">Foto de Perfil</label>
+                                    <InputText @bind-Value="@usuario.ImagenPath" class="form-control" id="imagen" placeholder="Nombre del archivo (ej: foto.jpg)" />
+                                    <div class="form-text">
+                                        Coloca tu imagen en la carpeta <strong>Resources/Images</strong> y escribe solo el nombre del archivo.
+                                        <br />Archivos disponibles: perro.jpg, dotnet_bot.svg
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Vista previa:</label>
+                                    <div class="border rounded p-3 d-flex align-items-center justify-content-center" style="height: 200px; background-color: #f8f9fa;">
+                                        @if (!string.IsNullOrWhiteSpace(usuario.ImagenPath))
+                                        {
+                                            <img src="@usuario.ImagenPath" 
+                                                 alt="Vista previa de @usuario.Nombre" 
+                                                 class="rounded-circle" 
+                                                 style="width: 120px; height: 120px; object-fit: cover;"
+                                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                            <div class="text-center text-muted" style="display: none;">
+                                                <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                                <p class="mt-2 mb-0 small">No encontrada</p>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center text-muted">
+                                                <i class="bi bi-person" style="font-size: 3rem;"></i>
+                                                <p class="mt-2 mb-0 small">Sin foto</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Información
+                                        </h6>
+                                        <ul class="list-unstyled small mb-0">
+                                            <li><strong>Nombre:</strong> @(string.IsNullOrWhiteSpace(usuario.Nombre) ? "Sin especificar" : usuario.Nombre)</li>
+                                            <li><strong>Email:</strong> @(string.IsNullOrWhiteSpace(usuario.Email) ? "Sin especificar" : usuario.Email)</li>
+                                            <li><strong>Contraseña:</strong> @(string.IsNullOrWhiteSpace(usuario.Password) ? "Sin especificar" : "••••••••")</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr />
+                        
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-success" disabled="@guardando">
+                                @if (guardando)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <span>Guardando...</span>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    <span>Guardar Usuario</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Usuarios usuario = new Usuarios();
+    private string mensajeError = string.Empty;
+    private bool guardando = false;
+
+    private async Task GuardarUsuario()
+    {
+        mensajeError = string.Empty;
+        guardando = true;
+
+        try
+        {
+            // Validaciones básicas
+            if (string.IsNullOrWhiteSpace(usuario.Nombre))
+            {
+                mensajeError = "El nombre es obligatorio.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario.Email))
+            {
+                mensajeError = "El email es obligatorio.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(usuario.Password) || usuario.Password.Length < 6)
+            {
+                mensajeError = "La contraseña debe tener al menos 6 caracteres.";
+                return;
+            }
+
+            // Verificar si el email ya existe
+            if (userService.EmailExists(usuario.Email))
+            {
+                mensajeError = "Ya existe un usuario con ese email.";
+                return;
+            }
+
+            // Simular delay de guardado
+            await Task.Delay(500);
+
+            userService.AddUsuario(usuario);
+            navigationManager.NavigateTo("/usuarios");
+        }
+        catch (Exception ex)
+        {
+            mensajeError = $"Error al guardar el usuario: {ex.Message}";
+        }
+        finally
+        {
+            guardando = false;
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo("/usuarios");
+    }
+}

@@ -1,0 +1,243 @@
+@page "/pelicula/editar/{Id:int}"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
+@inject NavigationManager navigationManager
+@inject PeliculaService peliculaService
+
+<PageTitle>Editar Película</PageTitle>
+
+@if (pelicula == null)
+{
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    No se encontró la película solicitada.
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" @onclick="VolverAlListado">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Volver al Listado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/peliculas" class="text-decoration-none">
+                                <i class="bi bi-film me-1"></i>Películas
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/pelicula/detalle/@Id" class="text-decoration-none">@pelicula.Titulo</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Editar</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-dark">
+                        <h3 class="mb-0">
+                            <i class="bi bi-pencil me-2"></i>
+                            Editar Película: @peliculaOriginal?.Titulo
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <EditForm Model="@pelicula" OnValidSubmit="@GuardarCambios">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="text-danger mb-3" />
+                            
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="mb-3">
+                                        <label for="titulo" class="form-label">Título de la Película</label>
+                                        <InputText @bind-Value="@pelicula.Titulo" class="form-control" id="titulo" placeholder="Ingrese el título" />
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="anio" class="form-label">Año</label>
+                                                <InputNumber @bind-Value="@pelicula.Anio" class="form-control" id="anio" placeholder="Año de lanzamiento" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="director" class="form-label">Director</label>
+                                                <InputText @bind-Value="@pelicula.Director" class="form-control" id="director" placeholder="Nombre del director" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="imagen" class="form-label">Imagen de la Película</label>
+                                        <InputText @bind-Value="@pelicula.ImagenPath" class="form-control" id="imagen" placeholder="Nombre del archivo (ej: poster.jpg)" />
+                                        <div class="form-text">
+                                            Coloca tu imagen en la carpeta <strong>Resources/Images</strong> y escribe solo el nombre del archivo.
+                                            <br />Archivos disponibles: perro.jpg, dotnet_bot.svg
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Vista previa actual:</label>
+                                        <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
+                                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                                            {
+                                                <img src="@pelicula.ImagenPath" 
+                                                     alt="Vista previa de @pelicula.Titulo" 
+                                                     class="img-fluid rounded" 
+                                                     style="max-height: 100%; max-width: 100%; object-fit: cover;"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                                <div class="text-center text-muted" style="display: none;">
+                                                    <i class="bi bi-image" style="font-size: 2rem;"></i>
+                                                    <p class="mt-1 mb-0 small">No encontrada</p>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-center text-muted">
+                                                    <i class="bi bi-image" style="font-size: 2rem;"></i>
+                                                    <p class="mt-1 mb-0 small">Sin imagen</p>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr />
+                            
+                            <div class="d-flex flex-wrap gap-2 justify-content-between">
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info" @onclick="VerDetalle">
+                                        <i class="bi bi-eye me-1"></i>
+                                        Ver Detalle
+                                    </button>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-warning" @onclick="RestaurarValores" title="Restaurar valores originales">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>
+                                        Restaurar
+                                    </button>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Pelicula? pelicula;
+    private Pelicula? peliculaOriginal; // Para guardar los valores originales
+
+    protected override void OnInitialized()
+    {
+        CargarPelicula();
+    }
+
+    private void CargarPelicula()
+    {
+        var peliculaEncontrada = peliculaService.GetPelicula(Id);
+        if (peliculaEncontrada != null)
+        {
+            // Guardamos una copia de los valores originales
+            peliculaOriginal = new Pelicula
+            {
+                Id = peliculaEncontrada.Id,
+                Titulo = peliculaEncontrada.Titulo,
+                Anio = peliculaEncontrada.Anio,
+                Director = peliculaEncontrada.Director,
+                ImagenPath = peliculaEncontrada.ImagenPath
+            };
+
+            // Creamos una copia para editar
+            pelicula = new Pelicula
+            {
+                Id = peliculaEncontrada.Id,
+                Titulo = peliculaEncontrada.Titulo,
+                Anio = peliculaEncontrada.Anio,
+                Director = peliculaEncontrada.Director,
+                ImagenPath = peliculaEncontrada.ImagenPath
+            };
+        }
+    }
+
+    private void GuardarCambios()
+    {
+        if (pelicula != null)
+        {
+            try
+            {
+                bool actualizada = peliculaService.UpdatePelicula(pelicula);
+                if (actualizada)
+                {
+                    navigationManager.NavigateTo($"/pelicula/detalle/{Id}");
+                }
+                else
+                {
+                    // Aquí podrías mostrar un mensaje de error
+                    Console.WriteLine("Error al actualizar la película");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al guardar cambios: {ex.Message}");
+            }
+        }
+    }
+
+    private void Cancelar()
+    {
+        navigationManager.NavigateTo($"/pelicula/detalle/{Id}");
+    }
+
+    private void VerDetalle()
+    {
+        navigationManager.NavigateTo($"/pelicula/detalle/{Id}");
+    }
+
+    private void VolverAlListado()
+    {
+        navigationManager.NavigateTo("/peliculas");
+    }
+
+    private void RestaurarValores()
+    {
+        if (peliculaOriginal != null && pelicula != null)
+        {
+            pelicula.Titulo = peliculaOriginal.Titulo;
+            pelicula.Anio = peliculaOriginal.Anio;
+            pelicula.Director = peliculaOriginal.Director;
+            pelicula.ImagenPath = peliculaOriginal.ImagenPath;
+            StateHasChanged(); // Forzar actualización de la UI
+        }
+    }
+}

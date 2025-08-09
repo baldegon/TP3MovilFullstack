@@ -1,0 +1,197 @@
+@page "/pelicula/detalle/{Id:int}"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
+@inject NavigationManager navigationManager
+@inject PeliculaService peliculaService
+
+<PageTitle>Detalle de Película</PageTitle>
+
+@if (pelicula == null)
+{
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    No se encontró la película solicitada.
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" @onclick="VolverAlListado">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Volver al Listado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/peliculas" class="text-decoration-none">
+                                <i class="bi bi-film me-1"></i>Películas
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">@pelicula.Titulo</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-5 mb-4">
+                <div class="card shadow">
+                    <div class="card-body p-0">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 400px; background-color: #f8f9fa;">
+                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                            {
+                                <img src="@pelicula.ImagenPath" 
+                                     alt="Póster de @pelicula.Titulo" 
+                                     class="img-fluid rounded" 
+                                     style="max-height: 100%; max-width: 100%; object-fit: cover;"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="text-center text-muted" style="display: none;">
+                                    <i class="bi bi-image" style="font-size: 4rem;"></i>
+                                    <p class="mt-3 mb-0">Imagen no disponible</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-image" style="font-size: 4rem;"></i>
+                                    <p class="mt-3 mb-0">Sin imagen</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-7">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="card-title mb-0">
+                            <i class="bi bi-film me-2"></i>
+                            @pelicula.Titulo
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">Director:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="fs-5">@pelicula.Director</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">Año:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="fs-5">@pelicula.Anio</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">ID:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="text-muted">#@pelicula.Id</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary" @onclick="VolverAlListado">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Volver al Listado
+                            </button>
+                            <button class="btn btn-warning" @onclick="EditarPelicula">
+                                <i class="bi bi-pencil me-1"></i>
+                                Editar Película
+                            </button>
+                            <button class="btn btn-danger" @onclick="EliminarPelicula" data-bs-toggle="modal" data-bs-target="#confirmarEliminar">
+                                <i class="bi bi-trash me-1"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal fade" id="confirmarEliminar" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Estás seguro de que deseas eliminar la película "<strong>@pelicula.Titulo</strong>"?
+                    <br />Esta acción no se puede deshacer.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmarEliminacion" data-bs-dismiss="modal">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Pelicula? pelicula;
+
+    protected override void OnInitialized()
+    {
+        CargarPelicula();
+    }
+
+    private void CargarPelicula()
+    {
+        pelicula = peliculaService.GetPelicula(Id);
+    }
+
+    private void VolverAlListado()
+    {
+        navigationManager.NavigateTo("/peliculas");
+    }
+
+    private void EditarPelicula()
+    {
+        navigationManager.NavigateTo($"/pelicula/editar/{Id}");
+    }
+
+    private void EliminarPelicula()
+    {
+        // Esta función se llama cuando se hace clic en el botón eliminar
+        // El modal se abre automáticamente por el atributo data-bs-toggle
+    }
+
+    private void ConfirmarEliminacion()
+    {
+        if (pelicula != null)
+        {
+            bool eliminada = peliculaService.DeletePelicula(pelicula.Id);
+            if (eliminada)
+            {
+                navigationManager.NavigateTo("/peliculas");
+            }
+        }
+    }
+}

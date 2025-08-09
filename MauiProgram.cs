@@ -16,10 +16,13 @@ namespace TP3MovilFullstack
                 });
 
             builder.Services.AddMauiBlazorWebView();
+            
+            // Registrar servicios
+            builder.Services.AddSingleton<PeliculaService>();
+            builder.Services.AddSingleton<UserService>();
 
 #if DEBUG
     		builder.Services.AddBlazorWebViewDeveloperTools();
-            builder.Services.AddSingleton<PeliculaService>();
             builder.Logging.AddDebug();
 #endif
 

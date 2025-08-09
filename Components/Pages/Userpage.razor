@@ -3,33 +3,6 @@
 <h3>Userpage</h3>
 
 
-<div class="container-fluid py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh;">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-xl-5">
-            <div class="card border-0 shadow-sm p-4" style="border-radius: 20px; background-color: #ffffffcc; backdrop-filter: blur(10px);">
-                <div class="card-header border-0 bg-transparent text-center mb-4">
-                    <h4 class="mb-0 text-dark fw-light">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
-                    </h4>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Login" method="post" class="needs-validation" novalidate>
-                        <div>
-                            <input class="form-label small" asp-for="Users.Username" type="text" placeholder="Ingrese su usuario" />
-                        </div>
-                        <div>
-                            <input type="password" placeholder="Ingrese su contraseña" />
-                        </div>
-                        <button type="submit" class="btn btn-primary rounded-pill w-100 mt-3"
-                                style="background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%); border: none;">
-                            Iniciar Sesión
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 @code {
 

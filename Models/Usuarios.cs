@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TP3MovilFullstack.Models
 {
-    internal class Usuarios
+    public class Usuarios
     {
         // Unique identifier for the user.
         public int Id { get; set; }

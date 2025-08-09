@@ -1,0 +1,271 @@
+@page "/usuario/detalle/{Id:int}"
+@using TP3MovilFullstack.Models 
+@using TP3MovilFullstack.Services 
+@inject NavigationManager navigationManager
+@inject UserService userService
+
+<PageTitle>Detalle de Usuario</PageTitle>
+
+@if (usuario == null)
+{
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="alert alert-warning text-center" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    No se encontró el usuario solicitado.
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-primary" @onclick="VolverAlListado">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Volver al Listado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/usuarios" class="text-decoration-none">
+                                <i class="bi bi-people me-1"></i>Usuarios
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">@usuario.Nombre</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 col-md-5 mb-4">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-person-circle me-2"></i>
+                            Foto de Perfil
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="d-flex align-items-center justify-content-center" style="height: 300px; background-color: #f8f9fa;">
+                            @if (!string.IsNullOrWhiteSpace(usuario.ImagenPath))
+                            {
+                                <img src="@usuario.ImagenPath" 
+                                     alt="Foto de @usuario.Nombre" 
+                                     class="img-fluid rounded" 
+                                     style="max-height: 100%; max-width: 100%; object-fit: cover;"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="text-center text-muted" style="display: none;">
+                                    <i class="bi bi-person" style="font-size: 4rem;"></i>
+                                    <p class="mt-3 mb-0">Imagen no disponible</p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-person" style="font-size: 4rem;"></i>
+                                    <p class="mt-3 mb-0">Sin foto de perfil</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8 col-md-7">
+                <div class="card shadow">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="card-title mb-0">
+                            <i class="bi bi-person-badge me-2"></i>
+                            Información del Usuario
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">
+                                    <i class="bi bi-person me-1"></i>
+                                    Nombre:
+                                </strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="fs-5">@usuario.Nombre</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">
+                                    <i class="bi bi-envelope me-1"></i>
+                                    Email:
+                                </strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="fs-5">@usuario.Email</span>
+                                <span class="badge bg-success ms-2">Acceso al sistema</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">
+                                    <i class="bi bi-key me-1"></i>
+                                    Contraseña:
+                                </strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="text-muted">••••••••••••</span>
+                                <small class="text-muted d-block">Por seguridad, no se muestra la contraseña</small>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-sm-3">
+                                <strong class="text-muted">
+                                    <i class="bi bi-hash me-1"></i>
+                                    ID:
+                                </strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="badge bg-secondary fs-6">#@usuario.Id</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-outline-primary" @onclick="VolverAlListado">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Volver al Listado
+                            </button>
+                            <button class="btn btn-warning" @onclick="EditarUsuario">
+                                <i class="bi bi-pencil me-1"></i>
+                                Editar Usuario
+                            </button>
+                            <button class="btn btn-danger" @onclick="@(() => {})" data-bs-toggle="modal" data-bs-target="#confirmarEliminar">
+                                <i class="bi bi-trash me-1"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta de estadísticas adicionales -->
+                <div class="card shadow mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Información Adicional
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="border-end">
+                                    <h4 class="text-primary mb-1">
+                                        <i class="bi bi-calendar-plus"></i>
+                                    </h4>
+                                    <small class="text-muted">Fecha de registro</small>
+                                    <p class="mb-0 fw-bold">Sistema</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border-end">
+                                    <h4 class="text-success mb-1">
+                                        <i class="bi bi-check-circle"></i>
+                                    </h4>
+                                    <small class="text-muted">Estado</small>
+                                    <p class="mb-0 fw-bold">Activo</p>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-info mb-1">
+                                    <i class="bi bi-shield-check"></i>
+                                </h4>
+                                <small class="text-muted">Permisos</small>
+                                <p class="mb-0 fw-bold">Usuario</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar -->
+    <div class="modal fade" id="confirmarEliminar" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmarEliminarLabel">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+                    <p>¿Estás seguro de que deseas eliminar el usuario <strong>"@usuario.Nombre"</strong>?</p>
+                    <ul class="text-muted small">
+                        <li>Se perderán todos los datos asociados</li>
+                        <li>El usuario no podrá acceder al sistema</li>
+                        <li>Esta acción es permanente</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmarEliminacion" data-bs-dismiss="modal">
+                        <i class="bi bi-trash me-1"></i>Eliminar Usuario
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Usuarios? usuario;
+
+    protected override void OnInitialized()
+    {
+        CargarUsuario();
+    }
+
+    private void CargarUsuario()
+    {
+        usuario = userService.GetUsuario(Id);
+    }
+
+    private void VolverAlListado()
+    {
+        navigationManager.NavigateTo("/usuarios");
+    }
+
+    private void EditarUsuario()
+    {
+        navigationManager.NavigateTo($"/usuario/editar/{Id}");
+    }
+
+    private void ConfirmarEliminacion()
+    {
+        if (usuario != null)
+        {
+            bool eliminado = userService.DeleteUsuario(usuario.Id);
+            if (eliminado)
+            {
+                navigationManager.NavigateTo("/usuarios");
+            }
+        }
+    }
+}

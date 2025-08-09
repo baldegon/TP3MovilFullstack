@@ -1,0 +1,57 @@
+@page "/registro"
+@inject TP3MovilFullstack.Services.UserService userService
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h1>Registro</h1>
+
+    <EditForm Model="registroModel" OnValidSubmit="HandleRegistro">
+        <DataAnnotationsValidator />
+                <ValidationSummary />
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <InputText id="nombre" @bind-Value="registroModel.Nombre" />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="registroModel.Email" />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <InputText id="password" @bind-Value="registroModel.Password" />
+        </div>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </div>
+
+    </EditForm>
+
+</div>
+
+
+@code{
+    private RegistroModel registroModel = new();
+    private string? errorMessage;
+
+
+    public void HandleRegistro(){
+        var user = userService.ValidateLogin(registroModel.Email, registroModel.Password);
+    }
+
+    public class RegistroModel
+    {
+        public string Nombre { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El correo es obligatorio")]
+        [EmailAddress(ErrorMessage = "Correo inválido")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public void Volver(){
+        Navigation.NavigateTo("/login");
+    }
+}
