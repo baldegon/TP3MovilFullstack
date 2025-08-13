@@ -1,65 +1,101 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using TP3MovilFullstack.Models;
 
 namespace TP3MovilFullstack.Services
 {
     public class PeliculaService
     {
-        private readonly List<Pelicula> peliculas;
+        private readonly List<Pelicula> _peliculas = new();
+        private const string PeliculasFileName = "peliculas.json";
+
         public PeliculaService()
         {
-            peliculas = new List<Pelicula>
-            {
-                new Pelicula { Id = 1, Titulo = "El Origen", Anio = 2010, Director = "Christopher Nolan", ImagenPath = "perro.jpg" },
-                new Pelicula { Id = 2, Titulo = "Interstellar", Anio = 2014, Director = "Christopher Nolan", ImagenPath = "dotnet_bot.svg" },
-                new Pelicula { Id = 3, Titulo = "Parasite", Anio = 2019, Director = "Bong Joon-ho", ImagenPath = "dotnet_bot.svg" }
-            };
+            LoadPeliculasFromJsonFile();
         }
 
-        public List<Pelicula> GetAll() => peliculas;
-
-
-        public Pelicula? GetPelicula(int id)
+        private string GetFilePath()
         {
-            return peliculas.FirstOrDefault(p => p.Id == id);
-        
+            return Path.Combine(FileSystem.AppDataDirectory, PeliculasFileName);
+        }
+
+        public List<Pelicula> GetAllPeliculas()
+        {
+            return _peliculas;
+        }
+
+        public Pelicula? GetById(int id)
+        {
+            return _peliculas.FirstOrDefault(p => p.Id == id);
         }
 
         public void AddPelicula(Pelicula pelicula)
         {
-            //pelicula.Id = peliculas.Max(p => p.Id) + 1;
-            pelicula.Id = peliculas.Any() ? peliculas.Max(p => p.Id) + 1 : 1;
-            peliculas.Add(pelicula);
+            pelicula.Id = _peliculas.Any() ? _peliculas.Max(p => p.Id) + 1 : 1;
+            _peliculas.Add(pelicula);
+            SavePeliculasToJsonFile();
         }
 
-        public bool UpdatePelicula(Pelicula peliculaActualizada)
+        public void Update(Pelicula pelicula)
         {
-            var peliculaExistente = peliculas.FirstOrDefault(p => p.Id == peliculaActualizada.Id);
+            var peliculaExistente = _peliculas.FirstOrDefault(p => p.Id == pelicula.Id);
             if (peliculaExistente != null)
             {
-                peliculaExistente.Titulo = peliculaActualizada.Titulo;
-                peliculaExistente.Anio = peliculaActualizada.Anio;
-                peliculaExistente.Director = peliculaActualizada.Director;
-                peliculaExistente.ImagenPath = peliculaActualizada.ImagenPath;
-                return true;
+                peliculaExistente.Titulo = pelicula.Titulo;
+                peliculaExistente.Anio = pelicula.Anio;
+                peliculaExistente.Director = pelicula.Director;
+
+                // Actualizar la imagen solo si se proporcionó una nueva
+                if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                {
+                    peliculaExistente.ImagenPath = pelicula.ImagenPath;
+                    peliculaExistente.ImagenContentType = pelicula.ImagenContentType;
+                }
             }
-            return false;
+            SavePeliculasToJsonFile();
         }
 
-        public bool DeletePelicula(int id)
+        public void DeletePelicula(int id)
         {
-            var pelicula = peliculas.FirstOrDefault(p => p.Id == id);
-            if (pelicula != null)
+            var peliculaToRemove = _peliculas.FirstOrDefault(p => p.Id == id);
+            if (peliculaToRemove != null)
             {
-                peliculas.Remove(pelicula);
-                return true;
+                // Opcional: Eliminar el archivo de imagen del disco
+                if (!string.IsNullOrWhiteSpace(peliculaToRemove.ImagenPath) && File.Exists(peliculaToRemove.ImagenPath))
+                {
+                    try
+                    {
+                        File.Delete(peliculaToRemove.ImagenPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error eliminando archivo de imagen: {ex.Message}");
+                    }
+                }
+                _peliculas.Remove(peliculaToRemove);
+                SavePeliculasToJsonFile();
             }
-            return false;
         }
 
+        private void SavePeliculasToJsonFile()
+        {
+            string fullPath = GetFilePath();
+            string jsonString = JsonSerializer.Serialize(_peliculas, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(fullPath, jsonString);
+        }
+
+        private void LoadPeliculasFromJsonFile()
+        {
+            string fullPath = GetFilePath();
+            if (File.Exists(fullPath))
+            {
+                string jsonString = File.ReadAllText(fullPath);
+                var peliculasFromFile = JsonSerializer.Deserialize<List<Pelicula>>(jsonString);
+                if (peliculasFromFile != null)
+                {
+                    _peliculas.Clear();
+                    _peliculas.AddRange(peliculasFromFile);
+                }
+            }
+        }
     }
 }

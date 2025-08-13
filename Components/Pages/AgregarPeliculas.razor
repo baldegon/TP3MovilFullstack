@@ -1,6 +1,7 @@
 ﻿@page "/pelicula"
-@using TP3MovilFullstack.Models 
-@using TP3MovilFullstack.Services 
+@using Microsoft.Maui.Storage
+@using TP3MovilFullstack.Models
+@using TP3MovilFullstack.Services
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
 
@@ -8,7 +9,7 @@
 
 <div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8">
+        <div class="col-lg-8 col-md-10">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
@@ -20,57 +21,84 @@
                     <EditForm Model="@pelicula" OnValidSubmit="@Grabar">
                         <DataAnnotationsValidator />
                         <ValidationSummary class="text-danger mb-3" />
-                        
-                        <div class="mb-3">
-                            <label for="titulo" class="form-label">Título de la Película</label>
-                            <InputText @bind-Value="@pelicula.Titulo" class="form-control" id="titulo" placeholder="Ingrese el título" />
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="anio" class="form-label">Año</label>
-                            <InputNumber @bind-Value="@pelicula.Anio" class="form-control" id="anio" placeholder="Año de lanzamiento" />
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="director" class="form-label">Director</label>
-                            <InputText @bind-Value="@pelicula.Director" class="form-control" id="director" placeholder="Nombre del director" />
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="imagen" class="form-label">Imagen de la Película</label>
-                            <InputText @bind-Value="@pelicula.ImagenPath" class="form-control" id="imagen" placeholder="Nombre del archivo (ej: poster.jpg)" />
-                            <div class="form-text">
-                                Coloca tu imagen en la carpeta <strong>Resources/Images</strong> y escribe solo el nombre del archivo.
-                                <br />Archivos disponibles: perro.jpg, dotnet_bot.svg
-                            </div>
-                            @if (!string.IsNullOrEmpty(pelicula.ImagenPath))
-                            {
-                                <div class="mt-2">
-                                    <label class="form-label">Vista previa:</label>
-                                    <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 150px; max-width: 200px; background-color: #f8f9fa;">
-                                        <img src="@pelicula.ImagenPath" 
-                                             alt="Vista previa de @pelicula.ImagenPath" 
-                                             class="img-fluid rounded" 
-                                             style="max-height: 100%; max-width: 100%; object-fit: cover;"
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-                                        <div class="text-center text-muted" style="display: none;">
-                                            <i class="bi bi-image" style="font-size: 2rem;"></i>
-                                            <p class="mt-1 mb-0 small">No encontrada</p>
-                                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="mb-3">
+                                    <label for="titulo" class="form-label">Título de la Película</label>
+                                    <InputText @bind-Value="@pelicula.Titulo" class="form-control" id="titulo" placeholder="Ingrese el título" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="anio" class="form-label">Año</label>
+                                    <InputNumber @bind-Value="@pelicula.Anio" class="form-control" id="anio" placeholder="Año de lanzamiento" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="director" class="form-label">Director</label>
+                                    <InputText @bind-Value="@pelicula.Director" class="form-control" id="director" placeholder="Nombre del director" />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Imagen de la Película</label>
+                                    <div>
+                                        <InputFile OnChange="@HandleFileSelected" id="imageUpload" style="display: none;" accept="image/*" />
+                                        <label for="imageUpload" class="btn btn-outline-primary">
+                                            <i class="bi bi-upload me-1"></i> Seleccionar Imagen
+                                        </label>
+                                        <span class="ms-2 text-muted">
+                                            @if (selectedFile != null)
+                                            {
+                                                @selectedFile.Name
+                                            }
+                                            else
+                                            {
+                                                <span>Ningún archivo seleccionado.</span>
+                                            }
+                                        </span>
                                     </div>
                                 </div>
-                            }
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Vista previa:</label>
+                                    <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
+                                        @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                                        {
+                                            <img src="@pelicula.ImagenPath"
+                                                 alt="Vista previa de la imagen"
+                                                 class="img-fluid rounded"
+                                                 style="max-height: 100%; max-width: 100%; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center text-muted">
+                                                <i class="bi bi-image" style="font-size: 2rem;"></i>
+                                                <p class="mt-1 mb-0 small">Sin imagen</p>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary me-md-2" @onclick="Volver">
-                                <i class="bi bi-arrow-left me-1"></i>
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-check-circle me-1"></i>
-                                Guardar Película
-                            </button>
+
+                        <hr />
+
+                        <div class="d-flex flex-wrap gap-2 justify-content-between">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-secondary" @onclick="Volver">
+                                    <i class="bi bi-arrow-left me-1"></i>
+                                    Cancelar
+                                </button>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Guardar Película
+                                </button>
+                            </div>
                         </div>
                     </EditForm>
                 </div>
@@ -81,23 +109,57 @@
 
 @code {
     private Pelicula pelicula = new Pelicula();
+    private IBrowserFile? selectedFile;
 
     private void Volver()
     {
         navigationManager.NavigateTo("/peliculas");
     }
 
-    private void Grabar()
+    private async Task Grabar()
     {
         try
         {
+            if (selectedFile != null)
+            {
+                // Usar el directorio de datos de la aplicación de MAUI
+                var uploadPath = Path.Combine(FileSystem.AppDataDirectory, "images");
+                if (!Directory.Exists(uploadPath))
+                {
+                    Directory.CreateDirectory(uploadPath);
+                }
+
+                var fileName = $"{Guid.NewGuid()}_{selectedFile.Name}";
+                var filePath = Path.Combine(uploadPath, fileName);
+
+                // Guardar el archivo en el directorio de la app
+                await using FileStream fs = new(filePath, FileMode.Create);
+                await selectedFile.OpenReadStream(maxAllowedSize: 5120000).CopyToAsync(fs); // Límite de 5MB
+
+                // Guardar la ruta completa del archivo para poder leerlo después
+                pelicula.ImagenPath = filePath;
+            }
+
             peliculaService.AddPelicula(pelicula);
             navigationManager.NavigateTo("/peliculas");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al agregar película: {ex.Message}");
-            // Aquí podrías mostrar un mensaje de error al usuario
         }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        if (selectedFile != null)
+        {
+            // Para la vista previa, creamos una URL de datos (Base64)
+            var buffer = new byte[selectedFile.Size];
+            await selectedFile.OpenReadStream().ReadAsync(buffer);
+            var base64 = Convert.ToBase64String(buffer);
+            pelicula.ImagenPath = $"data:{selectedFile.ContentType};base64,{base64}";
+        }
+        StateHasChanged();
     }
 }

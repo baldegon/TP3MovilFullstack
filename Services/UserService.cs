@@ -1,90 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using TP3MovilFullstack.Models;
 
 namespace TP3MovilFullstack.Services
 {
     public class UserService
     {
-        private readonly List<Usuarios> usuarios;
+        private readonly List<Usuario> _usuarios;
+        private const string UsersFileName = "usuarios.json";
 
         public UserService()
         {
-            usuarios = new List<Usuarios>
+            _usuarios = new List<Usuario>();
+            LoadUsersFromJsonFile();
+
+            // Si la lista está vacía, crea un administrador por defecto
+            if (!_usuarios.Any())
             {
-                new Usuarios { Id = 1, Nombre = "Juan Pérez", Email = "juan@ejemplo.com", Password = "123456", ImagenPath = "perro.jpg" },
-                new Usuarios { Id = 2, Nombre = "María García", Email = "maria@ejemplo.com", Password = "123456", ImagenPath = "dotnet_bot.svg" },
-                new Usuarios { Id = 3, Nombre = "Carlos López", Email = "carlos@ejemplo.com", Password = "123456", ImagenPath = "perro.jpg" },
-                new Usuarios { Id = 4, Nombre = "Ana Martínez", Email = "ana@ejemplo.com", Password = "123456", ImagenPath = null }
-            };
-        }
-
-        // Obtener todos los usuarios
-        public List<Usuarios> GetAll() => usuarios;
-
-        // Obtener usuario por ID
-        public Usuarios? GetUsuario(int id)
-        {
-            return usuarios.FirstOrDefault(u => u.Id == id);
-        }
-
-        // Obtener usuario por email (para login)
-        public Usuarios? GetUsuarioByEmail(string email)
-        {
-            return usuarios.FirstOrDefault(u => u.Email?.ToLower() == email?.ToLower());
-        }
-
-        // Agregar nuevo usuario
-        public void AddUsuario(Usuarios usuario)
-        {
-            usuario.Id = usuarios.Any() ? usuarios.Max(u => u.Id) + 1 : 1;
-            usuarios.Add(usuario);
-        }
-
-        // Actualizar usuario existente
-        public bool UpdateUsuario(Usuarios usuarioActualizado)
-        {
-            var usuarioExistente = usuarios.FirstOrDefault(u => u.Id == usuarioActualizado.Id);
-            if (usuarioExistente != null)
-            {
-                usuarioExistente.Nombre = usuarioActualizado.Nombre;
-                usuarioExistente.Email = usuarioActualizado.Email;
-                usuarioExistente.Password = usuarioActualizado.Password;
-                usuarioExistente.ImagenPath = usuarioActualizado.ImagenPath;
-                return true;
+                _usuarios.Add(new Usuario { Id = 1, Nombre = "Admin", Email = "admin@admin.com", Password = "admin", Rol = Rol.Administrador });
+                _usuarios.Add(new Usuario { Id = 2, Nombre = "Usuario Común", Email = "user@user.com", Password = "user", Rol = Rol.Usuario });
+                SaveChanges();
             }
-            return false;
         }
 
-        // Eliminar usuario
-        public bool DeleteUsuario(int id)
-        {
-            var usuario = usuarios.FirstOrDefault(u => u.Id == id);
-            if (usuario != null)
-            {
-                usuarios.Remove(usuario);
-                return true;
-            }
-            return false;
-        }
+        private string GetFilePath() => Path.Combine(FileSystem.AppDataDirectory, UsersFileName);
 
-        // Validar credenciales para login
-        public Usuarios? ValidateLogin(string email, string password)
+        public List<Usuario> GetAll() => _usuarios;
+
+        public Usuario? GetUsuario(int id) => _usuarios.FirstOrDefault(u => u.Id == id);
+
+        public Usuario? ValidateLogin(string email, string password)
         {
-            return usuarios.FirstOrDefault(u => 
-                u.Email?.ToLower() == email?.ToLower() && 
+            return _usuarios.FirstOrDefault(u =>
+                u.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) == true &&
                 u.Password == password);
         }
 
-        // Verificar si un email ya existe (para validación)
-        public bool EmailExists(string email, int excludeId = 0)
+        private void SaveChanges()
         {
-            return usuarios.Any(u => 
-                u.Email?.ToLower() == email?.ToLower() && 
-                u.Id != excludeId);
+            var filePath = GetFilePath();
+            var json = JsonSerializer.Serialize(_usuarios, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(filePath, json);
+        }
+
+        private void LoadUsersFromJsonFile()
+        {
+            var filePath = GetFilePath();
+            if (File.Exists(filePath))
+            {
+                var json = File.ReadAllText(filePath);
+                var users = JsonSerializer.Deserialize<List<Usuario>>(json);
+                if (users != null)
+                {
+                    _usuarios.Clear();
+                    _usuarios.AddRange(users);
+                }
+            }
         }
     }
 }

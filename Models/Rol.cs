@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TP3MovilFullstack.Services
+namespace TP3MovilFullstack.Models
 {
-    internal class BibliotecaService
+    public enum Rol
     {
+        Administrador,
+        Usuario
     }
 }

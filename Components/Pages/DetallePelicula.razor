@@ -144,9 +144,6 @@ else
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" @onclick="ConfirmarEliminacion" data-bs-dismiss="modal">
-                        <i class="bi bi-trash me-1"></i>Eliminar
-                    </button>
                 </div>
             </div>
         </div>
@@ -164,7 +161,7 @@ else
 
     private void CargarPelicula()
     {
-        pelicula = peliculaService.GetPelicula(Id);
+        peliculaService.GetAllPeliculas();
     }
 
     private void VolverAlListado()
@@ -183,15 +180,4 @@ else
         // El modal se abre automáticamente por el atributo data-bs-toggle
     }
 
-    private void ConfirmarEliminacion()
-    {
-        if (pelicula != null)
-        {
-            bool eliminada = peliculaService.DeletePelicula(pelicula.Id);
-            if (eliminada)
-            {
-                navigationManager.NavigateTo("/peliculas");
-            }
-        }
-    }
 }

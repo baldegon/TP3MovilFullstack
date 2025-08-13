@@ -1,6 +1,6 @@
 @page "/pelicula/editar/{Id:int}"
-@using TP3MovilFullstack.Models 
-@using TP3MovilFullstack.Services 
+@using TP3MovilFullstack.Models
+@using TP3MovilFullstack.Services
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
 
@@ -59,14 +59,14 @@ else
                         <EditForm Model="@pelicula" OnValidSubmit="@GuardarCambios">
                             <DataAnnotationsValidator />
                             <ValidationSummary class="text-danger mb-3" />
-                            
+
                             <div class="row">
                                 <div class="col-lg-8">
                                     <div class="mb-3">
                                         <label for="titulo" class="form-label">Título de la Película</label>
                                         <InputText @bind-Value="@pelicula.Titulo" class="form-control" id="titulo" placeholder="Ingrese el título" />
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="mb-3">
@@ -81,7 +81,7 @@ else
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="imagen" class="form-label">Imagen de la Película</label>
                                         <InputText @bind-Value="@pelicula.ImagenPath" class="form-control" id="imagen" placeholder="Nombre del archivo (ej: poster.jpg)" />
@@ -98,9 +98,9 @@ else
                                         <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
                                             @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
                                             {
-                                                <img src="@pelicula.ImagenPath" 
-                                                     alt="Vista previa de @pelicula.Titulo" 
-                                                     class="img-fluid rounded" 
+                                                <img src="@pelicula.ImagenPath"
+                                                     alt="Vista previa de @pelicula.Titulo"
+                                                     class="img-fluid rounded"
                                                      style="max-height: 100%; max-width: 100%; object-fit: cover;"
                                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
                                                 <div class="text-center text-muted" style="display: none;">
@@ -119,9 +119,9 @@ else
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <hr />
-                            
+
                             <div class="d-flex flex-wrap gap-2 justify-content-between">
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-secondary" @onclick="Cancelar">
@@ -133,7 +133,7 @@ else
                                         Ver Detalle
                                     </button>
                                 </div>
-                                
+
                                 <div class="d-flex gap-2">
                                     <button type="button" class="btn btn-outline-warning" @onclick="RestaurarValores" title="Restaurar valores originales">
                                         <i class="bi bi-arrow-clockwise me-1"></i>
@@ -165,7 +165,7 @@ else
 
     private void CargarPelicula()
     {
-        var peliculaEncontrada = peliculaService.GetPelicula(Id);
+        var peliculaEncontrada = peliculaService.GetById(Id);
         if (peliculaEncontrada != null)
         {
             // Guardamos una copia de los valores originales
@@ -196,16 +196,8 @@ else
         {
             try
             {
-                bool actualizada = peliculaService.UpdatePelicula(pelicula);
-                if (actualizada)
-                {
-                    navigationManager.NavigateTo($"/pelicula/detalle/{Id}");
-                }
-                else
-                {
-                    // Aquí podrías mostrar un mensaje de error
-                    Console.WriteLine("Error al actualizar la película");
-                }
+                peliculaService.Update(pelicula);
+                navigationManager.NavigateTo($"/peliculas");
             }
             catch (Exception ex)
             {
@@ -216,7 +208,7 @@ else
 
     private void Cancelar()
     {
-        navigationManager.NavigateTo($"/pelicula/detalle/{Id}");
+        navigationManager.NavigateTo($"/peliculas");
     }
 
     private void VerDetalle()
