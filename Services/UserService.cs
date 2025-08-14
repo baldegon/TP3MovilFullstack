@@ -8,6 +8,8 @@ namespace TP3MovilFullstack.Services
         private readonly List<Usuario> _usuarios;
         private const string UsersFileName = "usuarios.json";
 
+        public Usuario? CurrentUser { get; private set; }
+
         public UserService()
         {
             _usuarios = new List<Usuario>();
@@ -30,9 +32,30 @@ namespace TP3MovilFullstack.Services
 
         public Usuario? ValidateLogin(string email, string password)
         {
-            return _usuarios.FirstOrDefault(u =>
+            var user = _usuarios.FirstOrDefault(u =>
                 u.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) == true &&
                 u.Password == password);
+
+            if (user != null)
+            {
+                CurrentUser = user;
+            }
+
+            return user;
+        }
+
+        public void UpdateUser(Usuario updatedUser)
+        {
+            var index = _usuarios.FindIndex(u => u.Id == updatedUser.Id);
+            if (index != -1)
+            {
+                _usuarios[index] = updatedUser;
+                SaveChanges();
+                if (CurrentUser?.Id == updatedUser.Id)
+                {
+                    CurrentUser = updatedUser;
+                }
+            }
         }
 
         private void SaveChanges()
