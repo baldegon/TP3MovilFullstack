@@ -45,8 +45,8 @@
         var user = UserService.ValidateLogin(loginModel.Email, loginModel.Password);
         if (user != null)
         {
-            // Redirigir a la página de usuario o dashboard
-            Navigation.NavigateTo("/userpage");
+            // Redirigir al listado de películas
+            Navigation.NavigateTo("/peliculas");
         }
         else
         {
