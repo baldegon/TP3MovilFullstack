@@ -58,6 +58,20 @@ namespace TP3MovilFullstack.Services
             }
         }
 
+        public void DeleteUser(int id)
+        {
+            var user = _usuarios.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                _usuarios.Remove(user);
+                SaveChanges();
+                if (CurrentUser?.Id == id)
+                {
+                    CurrentUser = null;
+                }
+            }
+        }
+
         private void SaveChanges()
         {
             var filePath = GetFilePath();
