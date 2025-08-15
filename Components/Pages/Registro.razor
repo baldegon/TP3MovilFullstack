@@ -1,6 +1,8 @@
 @page "/registro"
 @inject TP3MovilFullstack.Services.UserService userService
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using TP3MovilFullstack.Models
 @inject NavigationManager Navigation
 
 <div class="container">
@@ -21,6 +23,10 @@
             <label for="password">Password</label>
             <InputText id="password" @bind-Value="registroModel.Password" />
         </div>
+        <div class="form-group">
+            <label for="imagen">Imagen</label>
+            <InputFile OnChange="HandleImageSelected" />
+        </div>
         <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">Registrar</button>
         </div>
@@ -32,11 +38,32 @@
 
 @code{
     private RegistroModel registroModel = new();
-    private string? errorMessage;
+    private string? imagePath;
 
+    private async Task HandleImageSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+        var path = Path.Combine(FileSystem.AppDataDirectory, fileName);
+        await using var stream = file.OpenReadStream();
+        await using var fs = File.OpenWrite(path);
+        await stream.CopyToAsync(fs);
+        imagePath = path;
+    }
 
-    public void HandleRegistro(){
-        var user = userService.ValidateLogin(registroModel.Email, registroModel.Password);
+    private void HandleRegistro()
+    {
+        var usuario = new Usuario
+        {
+            Nombre = registroModel.Nombre,
+            Email = registroModel.Email,
+            Password = registroModel.Password,
+            ImagenPath = imagePath,
+            Rol = Rol.Usuario
+        };
+
+        userService.AddUser(usuario);
+        Navigation.NavigateTo("/login");
     }
 
     public class RegistroModel
