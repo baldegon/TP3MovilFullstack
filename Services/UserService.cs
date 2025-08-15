@@ -18,8 +18,28 @@ namespace TP3MovilFullstack.Services
             // Si la lista está vacía, crea un administrador por defecto
             if (!_usuarios.Any())
             {
-                _usuarios.Add(new Usuario { Id = 1, Nombre = "Admin", Email = "admin@admin.com", Password = "admin", Rol = Rol.Administrador });
-                _usuarios.Add(new Usuario { Id = 2, Nombre = "Usuario Común", Email = "user@user.com", Password = "user", Rol = Rol.Usuario });
+                // Imágenes predeterminadas para los usuarios iniciales
+                var adminImage = Path.Combine("Resources", "Images", "dotnet_bot.svg");
+                var userImage = Path.Combine("Resources", "Images", "perro.jpg");
+
+                _usuarios.Add(new Usuario
+                {
+                    Id = 1,
+                    Nombre = "Admin",
+                    Email = "admin@admin.com",
+                    Password = "admin",
+                    Rol = Rol.Administrador,
+                    ImagenPath = adminImage
+                });
+                _usuarios.Add(new Usuario
+                {
+                    Id = 2,
+                    Nombre = "Usuario Común",
+                    Email = "user@user.com",
+                    Password = "user",
+                    Rol = Rol.Usuario,
+                    ImagenPath = userImage
+                });
                 SaveChanges();
             }
         }
@@ -54,6 +74,28 @@ namespace TP3MovilFullstack.Services
                 if (CurrentUser?.Id == updatedUser.Id)
                 {
                     CurrentUser = updatedUser;
+                }
+            }
+        }
+
+        public void AddUser(Usuario nuevo)
+        {
+            nuevo.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
+            _usuarios.Add(nuevo);
+            SaveChanges();
+        }
+
+        public void DeleteUser(int id)
+        {
+            var user = _usuarios.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                _usuarios.Remove(user);
+                SaveChanges();
+
+                if (CurrentUser?.Id == id)
+                {
+                    CurrentUser = null;
                 }
             }
         }
