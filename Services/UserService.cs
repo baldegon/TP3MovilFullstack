@@ -78,13 +78,6 @@ namespace TP3MovilFullstack.Services
             }
         }
 
-        public void AddUser(Usuario nuevo)
-        {
-            nuevo.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
-            _usuarios.Add(nuevo);
-            SaveChanges();
-        }
-
         public void DeleteUser(int id)
         {
             var user = _usuarios.FirstOrDefault(u => u.Id == id);
@@ -92,7 +85,6 @@ namespace TP3MovilFullstack.Services
             {
                 _usuarios.Remove(user);
                 SaveChanges();
-
                 if (CurrentUser?.Id == id)
                 {
                     CurrentUser = null;

@@ -1,6 +1,8 @@
 @page "/perfil"
+@page "/perfil/{id:int}"
 @using System.ComponentModel.DataAnnotations
 @using TP3MovilFullstack.Models
+@using Microsoft.AspNetCore.Components
 @inject TP3MovilFullstack.Services.UserService UserService
 
 <PageTitle>Perfil</PageTitle>
@@ -9,7 +11,7 @@
 
 @if (usuario == null)
 {
-    <p>No hay un usuario autenticado.</p>
+    <p>No hay un usuario seleccionado.</p>
 }
 else
 {
@@ -37,12 +39,21 @@ else
 }
 
 @code {
+    [Parameter] public int? Id { get; set; }
     private Usuario? usuario;
     private string? mensaje;
 
     protected override void OnInitialized()
     {
-        var current = UserService.CurrentUser;
+        Usuario? current = null;
+        if (Id.HasValue)
+        {
+            current = UserService.GetUsuario(Id.Value);
+        }
+        else
+        {
+            current = UserService.CurrentUser;
+        }
         if (current != null)
         {
             usuario = new Usuario

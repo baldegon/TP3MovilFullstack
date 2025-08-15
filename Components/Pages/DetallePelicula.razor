@@ -161,7 +161,12 @@ else
 
     private void CargarPelicula()
     {
-        peliculaService.GetAllPeliculas();
+        pelicula = peliculaService.GetById(Id);
+
+        if (pelicula == null)
+        {
+            // La interfaz mostrará un mensaje de error si no se encuentra la película
+        }
     }
 
     private void VolverAlListado()

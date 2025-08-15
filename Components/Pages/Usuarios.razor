@@ -1,0 +1,71 @@
+@page "/usuarios"
+@using TP3MovilFullstack.Models
+@inject TP3MovilFullstack.Services.UserService UserService
+@inject NavigationManager navigationManager
+
+<PageTitle>Usuarios</PageTitle>
+
+<h3>Listado de Usuarios</h3>
+
+@if (usuarios == null || !usuarios.Any())
+{
+    <p>No hay usuarios registrados.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var usuario in usuarios)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(usuario.ImagenPath))
+                        {
+                            <img src="@usuario.ImagenPath" alt="Imagen de @usuario.Nombre" style="width:50px;height:50px;object-fit:cover;" />
+                        }
+                    </td>
+                    <td>@usuario.Nombre</td>
+                    <td>@usuario.Email</td>
+                    <td>@usuario.Rol</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary me-2" @onclick="() => EditarUsuario(usuario.Id)">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => EliminarUsuario(usuario.Id)">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Usuario> usuarios = new();
+
+    protected override void OnInitialized()
+    {
+        usuarios = UserService.GetAll();
+    }
+
+    private void EditarUsuario(int id)
+    {
+        navigationManager.NavigateTo($"/perfil/{id}");
+    }
+
+    private void EliminarUsuario(int id)
+    {
+        UserService.DeleteUser(id);
+        usuarios = UserService.GetAll();
+    }
+}
