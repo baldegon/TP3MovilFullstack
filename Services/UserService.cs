@@ -64,6 +64,13 @@ namespace TP3MovilFullstack.Services
             return user;
         }
 
+        public void AddUser(Usuario newUser)
+        {
+            newUser.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
+            _usuarios.Add(newUser);
+            SaveChanges();
+        }
+
         public void UpdateUser(Usuario updatedUser)
         {
             var index = _usuarios.FindIndex(u => u.Id == updatedUser.Id);
