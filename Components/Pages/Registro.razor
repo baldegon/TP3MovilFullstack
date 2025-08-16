@@ -42,13 +42,20 @@
 
     private async Task HandleImageSelected(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
-        var path = Path.Combine(FileSystem.AppDataDirectory, fileName);
-        await using var stream = file.OpenReadStream();
-        await using var fs = File.OpenWrite(path);
-        await stream.CopyToAsync(fs);
-        imagePath = path;
+        try
+        {
+            var file = e.File;
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            var path = Path.Combine(FileSystem.AppDataDirectory, fileName);
+            await using var stream = file.OpenReadStream();
+            await using var fs = File.OpenWrite(path);
+            await stream.CopyToAsync(fs);
+            imagePath = path;
+        }
+        catch
+        {
+            throw new Exception();
+        }
     }
 
     private void HandleRegistro()
@@ -59,7 +66,7 @@
             Email = registroModel.Email,
             Password = registroModel.Password,
             ImagenPath = imagePath,
-            Rol = Rol.Usuario
+            Rol = ["user"]
         };
 
         userService.AddUser(usuario);
