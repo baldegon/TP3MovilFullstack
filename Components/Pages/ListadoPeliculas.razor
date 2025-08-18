@@ -6,7 +6,7 @@
 
 <PageTitle>Listado de Películas</PageTitle>
 
-<div class="container-fluid py-4">
+<div class="container py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -35,12 +35,12 @@
     }
     else
     {
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var pelicula in peliculas)
             {
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
+                        <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
                             @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
                             {
                                 <img src="@pelicula.ImagenPath"
@@ -77,7 +77,7 @@
                                         <i class="bi bi-pencil me-1"></i>
                                         Editar
                                     </button>
-                                    <button type="button" class="btn btn-danger" @onclick="() => EliminarPelicula(pelicula.Id)">
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => EliminarPelicula(pelicula.Id)">
                                         <i class="bi bi-trash me-1"></i>Eliminar
                                     </button>
                                 </div>

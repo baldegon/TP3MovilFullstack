@@ -64,6 +64,11 @@ namespace TP3MovilFullstack.Services
             return user;
         }
 
+        public void Logout()
+        {
+            CurrentUser = null;
+        }
+
         public void AddUser(Usuario newUser)
         {
             newUser.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
