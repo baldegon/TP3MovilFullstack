@@ -28,7 +28,7 @@ namespace TP3MovilFullstack.Services
                     Nombre = "Admin",
                     Email = "admin@admin.com",
                     Password = "admin",
-                    Rol = [],
+                    Rol = "admin",
                     ImagenPath = adminImage
                 });
                 _usuarios.Add(new Usuario
@@ -37,7 +37,7 @@ namespace TP3MovilFullstack.Services
                     Nombre = "Usuario Común",
                     Email = "user@user.com",
                     Password = "user",
-                    Rol = [],
+                    Rol = "user",
                     ImagenPath = userImage
                 });
                 SaveChanges();

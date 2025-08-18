@@ -12,7 +12,7 @@ namespace TP3MovilFullstack.Models
         public string? Nombre { get; set; }
         public string? Email { get; set; }
         public string? Password { get; set; }
-        public List<string>? Rol { get; set; } = new();// Rol del usuario
+        public string? Rol { get; set; } // Rol del usuario
         public string? ImagenPath { get; set; }
 
         // Propiedad para la UI, no se guarda
