@@ -79,6 +79,7 @@
                                         <i class="bi bi-eye me-1"></i>
                                         Ver Detalles
                                     </button>
+<<<<<<< HEAD
 
                                     @* Editar/Eliminar SOLO si el usuario actual NO es admin *@
                                     @if (IsAdmin(CurrentUser))
@@ -92,6 +93,15 @@
                                             <i class="bi bi-trash me-1"></i>Eliminar
                                         </button>
                                     }
+=======
+                                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => EditarPelicula(pelicula.Id)">
+                                        <i class="bi bi-pencil me-1"></i>
+                                        Editar
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => EliminarPelicula(pelicula.Id)">
+                                        <i class="bi bi-trash me-1"></i>Eliminar
+                                    </button>
+>>>>>>> af7e69b6e7495f4a173d456b44ae16d91f03c471
                                 </div>
                             </div>
                         </div>
