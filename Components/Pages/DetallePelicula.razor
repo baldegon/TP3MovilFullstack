@@ -2,6 +2,7 @@
 @using TP3MovilFullstack.Models 
 @using TP3MovilFullstack.Services 
 @inject NavigationManager navigationManager
+@inject TP3MovilFullstack.Services.UserService UserService
 @inject PeliculaService peliculaService
 
 <PageTitle>Detalle de Película</PageTitle>
@@ -115,14 +116,22 @@ else
                                 <i class="bi bi-arrow-left me-1"></i>
                                 Volver al Listado
                             </button>
-                            <button class="btn btn-warning" @onclick="EditarPelicula">
-                                <i class="bi bi-pencil me-1"></i>
-                                Editar Película
-                            </button>
-                            <button class="btn btn-danger" @onclick="EliminarPelicula" data-bs-toggle="modal" data-bs-target="#confirmarEliminar">
-                                <i class="bi bi-trash me-1"></i>
-                                Eliminar
-                            </button>
+                            
+                            @foreach(var usuario in usuarios)
+                            {
+                                if (usuario.Rol != "admin")
+                                {
+                                    <button class="btn btn-warning" @onclick="EditarPelicula">
+                                        <i class="bi bi-pencil me-1"></i>
+                                        Editar Película
+                                    </button>   
+
+                                    <button class="btn btn-danger" @onclick="EliminarPelicula" data-bs-toggle="modal" data-bs-target="#confirmarEliminar">
+                                        <i class="bi bi-trash me-1"></i>
+                                        Eliminar
+                                    </button>
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -151,6 +160,8 @@ else
 }
 
 @code {
+    private List<Usuario> usuarios = new();
+
     [Parameter] public int Id { get; set; }
     private Pelicula? pelicula;
 

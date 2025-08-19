@@ -3,10 +3,11 @@
 @using TP3MovilFullstack.Services
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
+@inject TP3MovilFullstack.Services.UserService UserService
 
 <PageTitle>Listado de Películas</PageTitle>
 
-<div class="container-fluid py-4">
+<div class="container py-4">
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,10 +15,15 @@
                     <i class="bi bi-film me-2"></i>
                     Listado de Películas
                 </h2>
-                <button class="btn btn-success" @onclick="AgregarPelicula">
-                    <i class="bi bi-plus-circle me-1"></i>
-                    Agregar Película
-                </button>
+
+                @* Mostrar el botón SOLO si el usuario actual NO es admin *@
+                @if (IsAdmin(CurrentUser))
+                {
+                    <button class="btn btn-success" @onclick="AgregarPelicula">
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Agregar Película
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -35,12 +41,12 @@
     }
     else
     {
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var pelicula in peliculas)
             {
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="col">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
+                        <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
                             @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
                             {
                                 <img src="@pelicula.ImagenPath"
@@ -73,13 +79,19 @@
                                         <i class="bi bi-eye me-1"></i>
                                         Ver Detalles
                                     </button>
-                                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => EditarPelicula(pelicula.Id)">
-                                        <i class="bi bi-pencil me-1"></i>
-                                        Editar
-                                    </button>
-                                    <button type="button" class="btn btn-danger" @onclick="() => EliminarPelicula(pelicula.Id)">
-                                        <i class="bi bi-trash me-1"></i>Eliminar
-                                    </button>
+
+                                    @* Editar/Eliminar SOLO si el usuario actual NO es admin *@
+                                    @if (IsAdmin(CurrentUser))
+                                    {
+                                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => EditarPelicula(pelicula.Id)">
+                                            <i class="bi bi-pencil me-1"></i>
+                                            Editar
+                                        </button>
+
+                                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => EliminarPelicula(pelicula.Id)">
+                                            <i class="bi bi-trash me-1"></i>Eliminar
+                                        </button>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -91,32 +103,31 @@
 </div>
 
 @code {
+    private Usuario? CurrentUser;
     private List<Pelicula>? peliculas;
 
     protected override void OnInitialized()
     {
+        // 1) Traer usuario actual: si no hay sesión, usar el primero como fallback (opcional)
+        CurrentUser = UserService.CurrentUser ?? UserService.GetAll().FirstOrDefault();
+
+        // 2) Cargar catálogo
         CargarPeliculas();
     }
+
+    private static bool IsAdmin(Usuario? u) =>
+        !string.Equals(u?.Rol?.Trim(), "user", StringComparison.OrdinalIgnoreCase);
 
     private void CargarPeliculas()
     {
         peliculas = peliculaService.GetAllPeliculas();
     }
 
-    private void AgregarPelicula()
-    {
-        navigationManager.NavigateTo("/pelicula");
-    }
+    private void AgregarPelicula() => navigationManager.NavigateTo("/pelicula");
 
-    private void VerDetalle(int id)
-    {
-        navigationManager.NavigateTo($"/pelicula/detalle/{id}");
-    }
+    private void VerDetalle(int id) => navigationManager.NavigateTo($"/pelicula/detalle/{id}");
 
-    private void EditarPelicula(int id)
-    {
-        navigationManager.NavigateTo($"/pelicula/editar/{id}");
-    }
+    private void EditarPelicula(int id) => navigationManager.NavigateTo($"/pelicula/editar/{id}");
 
     private void EliminarPelicula(int id)
     {

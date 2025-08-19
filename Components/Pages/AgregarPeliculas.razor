@@ -4,6 +4,8 @@
 @using TP3MovilFullstack.Services
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
+@inject TP3MovilFullstack.Services.UserService UserService
+
 
 <PageTitle>Agregar Película</PageTitle>
 
@@ -92,13 +94,12 @@
                                     Cancelar
                                 </button>
                             </div>
-
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-success">
                                     <i class="bi bi-check-circle me-1"></i>
                                     Guardar Película
                                 </button>
-                            </div>
+                            </div>                               
                         </div>
                     </EditForm>
                 </div>
@@ -108,8 +109,10 @@
 </div>
 
 @code {
+    private List<Usuario> usuarios = new();
     private Pelicula pelicula = new Pelicula();
     private IBrowserFile? selectedFile;
+
 
     private void Volver()
     {

@@ -19,8 +19,6 @@ else
                 <th>Imagen</th>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>Rol</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -35,13 +33,14 @@ else
                     </td>
                     <td>@usuario.Nombre</td>
                     <td>@usuario.Email</td>
-                    <td>@usuario.Rol</td>
                     <td>
-                        <button class="btn btn-sm btn-primary me-2" @onclick="() => EditarUsuario(usuario.Id)">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        @if (usuario.Rol != "admin")
+                        @if(IsAdmin(CurrentUser))
                         {
+                            
+                            <button class="btn btn-sm btn-primary me-2" @onclick="() => EditarUsuario(usuario.Id)">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
                             <button class="btn btn-sm btn-secondary me-2" @onclick="() => EliminarUsuario(usuario.Id)">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -54,10 +53,15 @@ else
 }
 
 @code {
+    private Usuario? CurrentUser;
     private List<Usuario> usuarios = new();
+
+    private static bool IsAdmin(Usuario? u) =>
+        !string.Equals(u?.Rol?.Trim(), "user", StringComparison.OrdinalIgnoreCase);
 
     protected override void OnInitialized()
     {
+        CurrentUser = UserService.CurrentUser ?? UserService.GetAll().FirstOrDefault();
         usuarios = UserService.GetAll();
     }
 
