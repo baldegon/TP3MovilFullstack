@@ -49,11 +49,11 @@ else
                 <div class="card shadow">
                     <div class="card-body p-0">
                         <div class="d-flex align-items-center justify-content-center" style="height: 400px; background-color: #f8f9fa;">
-                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenDataUrl))
                             {
-                                <img src="@pelicula.ImagenPath" 
-                                     alt="Póster de @pelicula.Titulo" 
-                                     class="img-fluid rounded" 
+                                <img src="@pelicula.ImagenDataUrl"
+                                     alt="Póster de @pelicula.Titulo"
+                                     class="img-fluid rounded"
                                      style="max-height: 100%; max-width: 100%; object-fit: cover;"
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
                                 <div class="text-center text-muted" style="display: none;">

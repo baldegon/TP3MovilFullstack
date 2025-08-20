@@ -47,9 +47,9 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
-                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenDataUrl))
                             {
-                                <img src="@pelicula.ImagenPath"
+                                <img src="@pelicula.ImagenDataUrl"
                                      alt="Póster de @pelicula.Titulo"
                                      class="img-fluid rounded-top"
                                      style="max-height: 100%; max-width: 100%; object-fit: cover;"

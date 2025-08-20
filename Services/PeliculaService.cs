@@ -1,5 +1,6 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using TP3MovilFullstack.Models;
+using TP3MovilFullstack.Utils;
 
 namespace TP3MovilFullstack.Services
 {
@@ -31,6 +32,7 @@ namespace TP3MovilFullstack.Services
         public void AddPelicula(Pelicula pelicula)
         {
             pelicula.Id = _peliculas.Any() ? _peliculas.Max(p => p.Id) + 1 : 1;
+            pelicula.ImagenDataUrl = ImageHelper.ToDataUrl(pelicula.ImagenPath);
             _peliculas.Add(pelicula);
             SavePeliculasToJsonFile();
         }
@@ -49,6 +51,7 @@ namespace TP3MovilFullstack.Services
                 {
                     peliculaExistente.ImagenPath = pelicula.ImagenPath;
                     peliculaExistente.ImagenContentType = pelicula.ImagenContentType;
+                    peliculaExistente.ImagenDataUrl = ImageHelper.ToDataUrl(pelicula.ImagenPath);
                 }
             }
             SavePeliculasToJsonFile();
@@ -94,6 +97,10 @@ namespace TP3MovilFullstack.Services
                 {
                     _peliculas.Clear();
                     _peliculas.AddRange(peliculasFromFile);
+                    foreach (var p in _peliculas)
+                    {
+                        p.ImagenDataUrl = ImageHelper.ToDataUrl(p.ImagenPath);
+                    }
                 }
             }
         }
