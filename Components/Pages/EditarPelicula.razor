@@ -96,9 +96,9 @@ else
                                     <div class="mb-3">
                                         <label class="form-label">Vista previa actual:</label>
                                         <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
-                                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
+                                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenDataUrl))
                                             {
-                                                <img src="@pelicula.ImagenPath"
+                                                <img src="@pelicula.ImagenDataUrl"
                                                      alt="Vista previa de @pelicula.Titulo"
                                                      class="img-fluid rounded"
                                                      style="max-height: 100%; max-width: 100%; object-fit: cover;"
@@ -175,7 +175,8 @@ else
                 Titulo = peliculaEncontrada.Titulo,
                 Anio = peliculaEncontrada.Anio,
                 Director = peliculaEncontrada.Director,
-                ImagenPath = peliculaEncontrada.ImagenPath
+                ImagenPath = peliculaEncontrada.ImagenPath,
+                ImagenDataUrl = peliculaEncontrada.ImagenDataUrl
             };
 
             // Creamos una copia para editar
@@ -185,7 +186,8 @@ else
                 Titulo = peliculaEncontrada.Titulo,
                 Anio = peliculaEncontrada.Anio,
                 Director = peliculaEncontrada.Director,
-                ImagenPath = peliculaEncontrada.ImagenPath
+                ImagenPath = peliculaEncontrada.ImagenPath,
+                ImagenDataUrl = peliculaEncontrada.ImagenDataUrl
             };
         }
     }
@@ -229,6 +231,7 @@ else
             pelicula.Anio = peliculaOriginal.Anio;
             pelicula.Director = peliculaOriginal.Director;
             pelicula.ImagenPath = peliculaOriginal.ImagenPath;
+            pelicula.ImagenDataUrl = peliculaOriginal.ImagenDataUrl;
             StateHasChanged(); // Forzar actualización de la UI
         }
     }
