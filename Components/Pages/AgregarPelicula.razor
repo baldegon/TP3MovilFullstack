@@ -2,7 +2,6 @@
 @using Microsoft.Maui.Storage
 @using TP3MovilFullstack.Models
 @using TP3MovilFullstack.Services
-@using TP3MovilFullstack.Utils
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
 @inject TP3MovilFullstack.Services.UserService UserService
@@ -67,9 +66,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">Vista previa:</label>
                                     <div class="border rounded p-2 d-flex align-items-center justify-content-center" style="height: 250px; background-color: #f8f9fa;">
-                                        @if (!string.IsNullOrWhiteSpace(pelicula.ImagenDataUrl))
+                                        @if (!string.IsNullOrWhiteSpace(previewImageUrl))
                                         {
-                                            <img src="@pelicula.ImagenDataUrl"
+                                            <img src="@previewImageUrl"
                                                  alt="Vista previa de la imagen"
                                                  class="img-fluid rounded"
                                                  style="max-height: 100%; max-width: 100%; object-fit: cover;" />
@@ -113,8 +112,7 @@
     private List<Usuario> usuarios = new();
     private Pelicula pelicula = new Pelicula();
     private IBrowserFile? selectedFile;
-
-
+    private string? previewImageUrl;
     private void Volver()
     {
         navigationManager.NavigateTo("/peliculas");
@@ -143,7 +141,6 @@
                 // Guardar la ruta completa del archivo y datos asociados
                 pelicula.ImagenPath = filePath;
                 pelicula.ImagenContentType = selectedFile.ContentType;
-                pelicula.ImagenDataUrl = ImageHelper.ToDataUrl(filePath);
             }
 
             peliculaService.AddPelicula(pelicula);
@@ -165,7 +162,7 @@
             await selectedFile.OpenReadStream(maxAllowedSize: 5120000).ReadAsync(buffer);
             var base64 = Convert.ToBase64String(buffer);
             pelicula.ImagenContentType = selectedFile.ContentType;
-            pelicula.ImagenDataUrl = $"data:{selectedFile.ContentType};base64,{base64}";
+            previewImageUrl = $"data:{selectedFile.ContentType};base64,{base64}";
         }
         StateHasChanged();
     }

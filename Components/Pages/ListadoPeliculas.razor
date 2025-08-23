@@ -1,6 +1,7 @@
 @page "/peliculas"
 @using TP3MovilFullstack.Models
 @using TP3MovilFullstack.Services
+@using TP3MovilFullstack.Utils
 @inject NavigationManager navigationManager
 @inject PeliculaService peliculaService
 @inject TP3MovilFullstack.Services.UserService UserService
@@ -47,9 +48,9 @@
                 <div class="col">
                     <div class="card h-100 shadow-sm">
                         <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
-                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenDataUrl))
+                            @if (!string.IsNullOrWhiteSpace(pelicula.ImagenPath))
                             {
-                                <img src="@pelicula.ImagenDataUrl"
+                                <img src="@ImageHelper.ToDataUrl(pelicula.ImagenPath)"
                                      alt="Póster de @pelicula.Titulo"
                                      class="img-fluid rounded-top"
                                      style="max-height: 100%; max-width: 100%; object-fit: cover;"
