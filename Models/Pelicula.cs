@@ -9,14 +9,8 @@ namespace TP3MovilFullstack.Models
         public int Anio { get; set; }
         public string? Director { get; set; }
 
-        // Ruta del archivo guardado en el dispositivo
-        public string? ImagenPath { get; set; }
-
-        // Tipo de contenido de la imagen (ej: "image/jpeg")
-        public string? ImagenContentType { get; set; }
-
-        // Propiedad para mostrar la imagen en la UI (no se guarda en el JSON)
+        // Ruta del archivo guardado en el dispositivo (no se persiste en JSON)
         [JsonIgnore]
-        public string? ImagenDataUrl { get; set; }
+        public string? ImagenPath { get; set; }
     }
 }

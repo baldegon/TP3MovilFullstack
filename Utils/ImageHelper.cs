@@ -46,11 +46,27 @@ namespace TP3MovilFullstack.Utils
                 return appData;
             }
 
-            // Check in AppPackageDirectory
-            var appPackage = Path.Combine(FileSystem.AppPackageDirectory, path);
-            if (File.Exists(appPackage))
+            // Check in AppPackageDirectory (may fail on some platforms)
+            try
             {
-                return appPackage;
+                var basePackage = FileSystem.AppPackageDirectory;
+
+                var appPackage = Path.Combine(basePackage, path);
+                if (File.Exists(appPackage))
+                {
+                    return appPackage;
+                }
+
+                // Also look under a wwwroot folder for static assets
+                var wwwrootPackage = Path.Combine(basePackage, "wwwroot", path);
+                if (File.Exists(wwwrootPackage))
+                {
+                    return wwwrootPackage;
+                }
+            }
+            catch
+            {
+                // Ignore if AppPackageDirectory is not supported
             }
 
             return path; // return original, will fail later

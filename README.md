@@ -74,7 +74,7 @@ dotnet workload install maui
 
 * **Películas**: `peliculas.json` en `AppDataDirectory`.
 * **Usuarios**: `usuarios.json` en `AppDataDirectory`.
-* Los servicios cargan/guardan listas en memoria y serializan a JSON.
+* Los servicios cargan/guardan listas en memoria y serializan a JSON (las imágenes no se persisten en los archivos).
 
 ### Formatos soportados para `usuarios.json`
 
@@ -87,8 +87,7 @@ dotnet workload install maui
     "Nombre": "Admin",
     "Email": "admin@admin.com",
     "Password": "admin",
-    "Rol": "admin",
-    "ImagenPath": "<ruta-a-imagen>"
+    "Rol": "admin"
   }
 ]
 ```
@@ -97,7 +96,7 @@ dotnet workload install maui
 
 ```json
 [
-  "Nombre|Email|Password|Rol|ImagenPath"
+  "Nombre|Email|Password|Rol"
 ]
 ```
 

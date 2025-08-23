@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace TP3MovilFullstack.Models
 {
@@ -13,10 +14,9 @@ namespace TP3MovilFullstack.Models
         public string? Email { get; set; }
         public string? Password { get; set; }
         public string? Rol { get; set; } // Rol del usuario
-        public string? ImagenPath { get; set; }
 
-        // Propiedad para la UI, no se guarda
-        public string? ImagenDataUrl { get; set; }
+        [JsonIgnore]
+        public string? ImagenPath { get; set; }
     }
 }
 

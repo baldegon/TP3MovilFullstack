@@ -1,6 +1,5 @@
 using System.Text.Json;
 using TP3MovilFullstack.Models;
-using TP3MovilFullstack.Utils;
 
 namespace TP3MovilFullstack.Services
 {
@@ -30,8 +29,7 @@ namespace TP3MovilFullstack.Services
                     Email = "admin@admin.com",
                     Password = "admin",
                     Rol = "admin",
-                    ImagenPath = adminImage,
-                    ImagenDataUrl = ImageHelper.ToDataUrl(adminImage)
+                    ImagenPath = adminImage
                 });
                 _usuarios.Add(new Usuario
                 {
@@ -40,8 +38,7 @@ namespace TP3MovilFullstack.Services
                     Email = "user@user.com",
                     Password = "user",
                     Rol = "user",
-                    ImagenPath = userImage,
-                    ImagenDataUrl = ImageHelper.ToDataUrl(userImage)
+                    ImagenPath = userImage
                 });
                 SaveChanges();
             }
@@ -75,7 +72,6 @@ namespace TP3MovilFullstack.Services
         public void AddUser(Usuario newUser)
         {
             newUser.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
-            newUser.ImagenDataUrl = ImageHelper.ToDataUrl(newUser.ImagenPath);
             _usuarios.Add(newUser);
             SaveChanges();
         }
@@ -85,7 +81,6 @@ namespace TP3MovilFullstack.Services
             var index = _usuarios.FindIndex(u => u.Id == updatedUser.Id);
             if (index != -1)
             {
-                updatedUser.ImagenDataUrl = ImageHelper.ToDataUrl(updatedUser.ImagenPath);
                 _usuarios[index] = updatedUser;
                 SaveChanges();
                 if (CurrentUser?.Id == updatedUser.Id)
@@ -129,7 +124,7 @@ namespace TP3MovilFullstack.Services
                     _usuarios.AddRange(users);
                     foreach (var u in _usuarios)
                     {
-                        u.ImagenDataUrl = ImageHelper.ToDataUrl(u.ImagenPath);
+                        // ImagenPath se mantiene en memoria solamente
                     }
                 }
             }
