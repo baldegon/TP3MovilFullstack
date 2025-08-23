@@ -14,9 +14,6 @@ namespace TP3MovilFullstack.Models
         public string? Password { get; set; }
         public string? Rol { get; set; } // Rol del usuario
         public string? ImagenPath { get; set; }
-
-        // Propiedad para la UI, no se guarda
-        public string? ImagenDataUrl { get; set; }
     }
 }
 

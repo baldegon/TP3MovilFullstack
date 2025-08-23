@@ -1,53 +1,41 @@
-using System.Text.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using TP3MovilFullstack.Models;
-using TP3MovilFullstack.Utils;
 
 namespace TP3MovilFullstack.Services
 {
     public class UserService
     {
         private readonly List<Usuario> _usuarios;
-        private const string UsersFileName = "usuarios.json";
 
         public Usuario? CurrentUser { get; private set; }
 
         public UserService()
         {
-            _usuarios = new List<Usuario>();
-            LoadUsersFromJsonFile();
-
-            // Si la lista está vacía, crea un administrador por defecto
-            if (!_usuarios.Any())
+            _usuarios = new List<Usuario>
             {
-                // Imágenes predeterminadas para los usuarios iniciales
-                var adminImage = Path.Combine("Resources", "Images", "dotnet_bot.svg");
-                var userImage = Path.Combine("Resources", "Images", "perro.jpg");
-
-                _usuarios.Add(new Usuario
+                new Usuario
                 {
                     Id = 1,
                     Nombre = "Admin",
                     Email = "admin@admin.com",
                     Password = "admin",
                     Rol = "admin",
-                    ImagenPath = adminImage,
-                    ImagenDataUrl = ImageHelper.ToDataUrl(adminImage)
-                });
-                _usuarios.Add(new Usuario
+                    ImagenPath = Path.Combine("Resources", "Images", "dotnet_bot.svg")
+                },
+                new Usuario
                 {
                     Id = 2,
                     Nombre = "Usuario Común",
                     Email = "user@user.com",
                     Password = "user",
                     Rol = "user",
-                    ImagenPath = userImage,
-                    ImagenDataUrl = ImageHelper.ToDataUrl(userImage)
-                });
-                SaveChanges();
-            }
+                    ImagenPath = Path.Combine("Resources", "Images", "perro.jpg")
+                }
+            };
         }
-
-        private string GetFilePath() => Path.Combine(FileSystem.AppDataDirectory, UsersFileName);
 
         public List<Usuario> GetAll() => _usuarios;
 
@@ -67,17 +55,12 @@ namespace TP3MovilFullstack.Services
             return user;
         }
 
-        public void Logout()
-        {
-            CurrentUser = null;
-        }
+        public void Logout() => CurrentUser = null;
 
         public void AddUser(Usuario newUser)
         {
             newUser.Id = _usuarios.Any() ? _usuarios.Max(u => u.Id) + 1 : 1;
-            newUser.ImagenDataUrl = ImageHelper.ToDataUrl(newUser.ImagenPath);
             _usuarios.Add(newUser);
-            SaveChanges();
         }
 
         public void UpdateUser(Usuario updatedUser)
@@ -85,9 +68,7 @@ namespace TP3MovilFullstack.Services
             var index = _usuarios.FindIndex(u => u.Id == updatedUser.Id);
             if (index != -1)
             {
-                updatedUser.ImagenDataUrl = ImageHelper.ToDataUrl(updatedUser.ImagenPath);
                 _usuarios[index] = updatedUser;
-                SaveChanges();
                 if (CurrentUser?.Id == updatedUser.Id)
                 {
                     CurrentUser = updatedUser;
@@ -101,38 +82,12 @@ namespace TP3MovilFullstack.Services
             if (user != null)
             {
                 _usuarios.Remove(user);
-                SaveChanges();
                 if (CurrentUser?.Id == id)
                 {
                     CurrentUser = null;
                 }
             }
         }
-
-        private void SaveChanges()
-        {
-            var filePath = GetFilePath();
-            var json = JsonSerializer.Serialize(_usuarios, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(filePath, json);
-        }
-
-        private void LoadUsersFromJsonFile()
-        {
-            var filePath = GetFilePath();
-            if (File.Exists(filePath))
-            {
-                var json = File.ReadAllText(filePath);
-                var users = JsonSerializer.Deserialize<List<Usuario>>(json);
-                if (users != null)
-                {
-                    _usuarios.Clear();
-                    _usuarios.AddRange(users);
-                    foreach (var u in _usuarios)
-                    {
-                        u.ImagenDataUrl = ImageHelper.ToDataUrl(u.ImagenPath);
-                    }
-                }
-            }
-        }
     }
 }
+

@@ -1,5 +1,3 @@
-﻿using System.Text.Json.Serialization;
-
 namespace TP3MovilFullstack.Models
 {
     public class Pelicula
@@ -14,9 +12,5 @@ namespace TP3MovilFullstack.Models
 
         // Tipo de contenido de la imagen (ej: "image/jpeg")
         public string? ImagenContentType { get; set; }
-
-        // Propiedad para mostrar la imagen en la UI (no se guarda en el JSON)
-        [JsonIgnore]
-        public string? ImagenDataUrl { get; set; }
     }
 }
