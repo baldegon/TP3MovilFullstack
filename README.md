@@ -1,6 +1,6 @@
 # TP3MovilFullstack — MAUI Blazor Hybrid
 
-Catálogo de películas + panel de usuarios, construido con **.NET MAUI Blazor (Blazor Hybrid)**. Persiste datos en **JSON** y muestra imágenes locales convirtiéndolas a **Data URL (Base64)** para que el WebView pueda renderizarlas sin drama.
+Catálogo de películas + panel de usuarios, construido con **.NET MAUI Blazor (Blazor Hybrid)**. Maneja los datos en memoria y muestra imágenes locales convirtiéndolas a **Data URL (Base64)** para que el WebView pueda renderizarlas sin drama.
 
 ---
 
@@ -66,42 +66,7 @@ dotnet workload install maui
 
    O desde Visual Studio, seleccione el destino (Windows/Android/iOS) y **Start**.
 
-> Tip: En Android/iOS, los paths de archivos difieren. El proyecto usa `FileSystem.AppDataDirectory` para guardar JSON e imágenes del usuario.
-
----
-
-## 💾 Persistencia de datos
-
-* **Películas**: `peliculas.json` en `AppDataDirectory`.
-* **Usuarios**: `usuarios.json` en `AppDataDirectory`.
-* Los servicios cargan/guardan listas en memoria y serializan a JSON.
-
-### Formatos soportados para `usuarios.json`
-
-* **Lista de objetos** (recomendado):
-
-```json
-[
-  {
-    "Id": 1,
-    "Nombre": "Admin",
-    "Email": "admin@admin.com",
-    "Password": "admin",
-    "Rol": "admin",
-    "ImagenPath": "<ruta-a-imagen>"
-  }
-]
-```
-
-* **Lista de strings** (compatibilidad):
-
-```json
-[
-  "Nombre|Email|Password|Rol|ImagenPath"
-]
-```
-
-> El servicio hace `Trim()` y comparaciones **case-insensitive** para roles.
+> Tip: En Android/iOS, los paths de archivos difieren. El proyecto usa `FileSystem.AppDataDirectory` para almacenar imágenes del usuario.
 
 ---
 
@@ -175,7 +140,6 @@ private static bool IsAdmin(Usuario? u) =>
 
 * **No se ven imágenes**: verifique que `ImagenPath` apunte a un archivo **existente**. Use `ImageHelper.ToDataUrl(path)`. En Android/iOS, use `AppDataDirectory`.
 * **Botones que no cambian según rol**: confirme el rol real (`Trim()` + comparación `OrdinalIgnoreCase`).
-* **No carga JSON**: valide el formato (objeto vs string). Hay tolerancia, pero un JSON mal cerrado romperá el parseo.
 * **Null en CurrentUser**: establezca sesión con `UserService.ValidateLogin(...)` o seleccione un usuario por defecto.
 
 ---
